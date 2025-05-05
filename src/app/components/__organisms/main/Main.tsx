@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 
 interface CollorArr {
   color: string;
@@ -124,27 +125,34 @@ function Main() {
   return (
     <div className="w-full min-h-screen p-5 flex flex-wrap gap-4">
       {inputs.map((input, index) => (
-        <div
+        <motion.div
+          drag
+          dragMomentum={false}
+          dragElastic={0}
+          layout
           key={index}
           style={{ backgroundColor: input.color }}
-          className="w-[300px]  h-[250px] overflow-auto  rounded-[15px] flex flex-col px-5 py-4 items-center shadow-xl"
+          className=" cursor-pointer w-[300px]  h-[250px] overflow-auto  rounded-[15px] flex flex-col px-5 py-4 items-center shadow-xl relative"
         >
-          <button
-            onClick={() => downloadTasks(index)}
-            className="bg-white text-xs px-2 py-1 rounded shadow self-start mb-2"
-          >
-            Download
-          </button>
-          <button
-            onClick={() => deleteInput(index)}
-            className="w-6 h-6 rounded-full border border-black flex items-center justify-center bg-white text-sm self-end mb-2"
-          >
-            x
-          </button>
+          <div className="flex items-center justify-between w-[100%]">
+            <button
+              onClick={() => downloadTasks(index)}
+              className="bg-white text-xs px-2 py-1 rounded shadow self-start mb-2"
+            >
+              Download
+            </button>
+            <button
+              onClick={() => deleteInput(index)}
+              className="w-[24px] h-[24px] rounded-[50%] border border-black flex items-center justify-center bg-white text-[14px] "
+            >
+              x
+            </button>
+          </div>
+
           <input
             value={inputValues[index] || ""}
             onChange={(e) => handleChange(e, index)}
-            className="w-full h-8 border border-black outline-none px-3"
+            className="w-[100%] min-h-[30px] border border-black outline-none px-[12px]"
             type="text"
             placeholder="Add a task..."
           />
@@ -156,8 +164,12 @@ function Main() {
           </button>
           <div className="mt-4 w-full">
             {input.arr.map((task, key) => (
-              <div
-                className="flex gap-2 mt-2 justify-between items-center"
+              <motion.div
+                drag
+                dragMomentum={false}
+                dragElastic={0}
+                layout
+                className="flex gap-2 mt-2 justify-between items-center absolute "
                 key={key}
               >
                 {editingTask &&
@@ -215,10 +227,10 @@ function Main() {
                     </div>
                   </>
                 )}
-              </div>
+              </motion.div>
             ))}
           </div>
-        </div>
+        </motion.div>
       ))}
 
       <div className="fixed bottom-5 left-1/2 transform -translate-x-1/2 flex flex-col items-center gap-4">

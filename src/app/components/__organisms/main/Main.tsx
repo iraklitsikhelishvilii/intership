@@ -29,7 +29,6 @@ function Main() {
   const [mount, setMount] = useState(false);
 
   const containerRefs = useRef<(HTMLDivElement | null)[]>([]);
-
   useEffect(() => {
     const storedInputs = localStorage.getItem("inputs");
     if (storedInputs) {
@@ -134,16 +133,56 @@ function Main() {
     URL.revokeObjectURL(url);
   };
 
+  const handleDrag = (e: MouseEvent) => {
+    if (!draggedTask) return;
+
+    const { clientX, clientY } = e;
+
+    for (let i = 0; i < containerRefs.current.length; i++) {
+      const container = containerRefs.current[i];
+      if (!container || i === draggedTask.fromIndex) continue;
+
+      const rect = container.getBoundingClientRect();
+
+      const isInside =
+        clientX >= rect.left &&
+        clientX <= rect.right &&
+        clientY >= rect.top &&
+        clientY <= rect.bottom;
+
+      if (isInside) {
+        const updatedInputs = [...inputs];
+        updatedInputs[draggedTask.fromIndex].arr.splice(
+          draggedTask.taskIndex,
+          1
+        );
+        updatedInputs[i].arr.push(draggedTask.task);
+        setInputs(updatedInputs);
+        setDraggedTask(null);
+        break;
+      }
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener("mousemove", handleDrag);
+    return () => {
+      window.removeEventListener("mousemove", handleDrag);
+    };
+  }, [draggedTask, inputs]);
+
   return (
     <div className="w-full min-h-screen p-5 flex flex-wrap gap-4">
       {inputs.map((input, index) => (
         <motion.div
           key={index}
-          ref={(el) => (containerRefs.current[index] = el)}
+          ref={(el) => {
+            containerRefs.current[index] = el as HTMLDivElement | null;
+          }}
           style={{ backgroundColor: input.color }}
-          className="w-[300px] h-[250px]  rounded-[15px] flex flex-col px-5 py-4 items-center shadow-xl relative"
+          className="w-[300px] h-[250px] overflow-auto rounded-[15px] flex flex-col px-5 py-4 items-center shadow-xl relative"
         >
-          <div className="flex items-center justify-between w-[100%]">
+          <div className="flex items-center justify-between w-full">
             <button
               onClick={() => downloadTasks(index)}
               className="bg-white text-xs px-2 py-1 rounded shadow self-start mb-2"
@@ -161,7 +200,7 @@ function Main() {
           <input
             value={inputValues[index] || ""}
             onChange={(e) => handleChange(e, index)}
-            className="w-[100%] min-h-[30px] border border-black outline-none px-[12px]"
+            className="w-full min-h-[30px] border border-black outline-none px-[12px]"
             type="text"
             placeholder="Add a task..."
           />
@@ -171,47 +210,14 @@ function Main() {
           >
             Add
           </button>
-          <div className="mt-4 w-full space-y-2 relative">
+          <div className="mt-4 w-full space-y-2">
             {input.arr.map((task, taskIndex) => (
               <motion.div
                 key={taskIndex}
                 drag
-                dragMomentum={false}
-                dragElastic={0}
                 onDragStart={() =>
                   setDraggedTask({ task, fromIndex: index, taskIndex })
                 }
-                onDragEnd={(event, info) => {
-                  if (!draggedTask) return;
-
-                  for (let i = 0; i < containerRefs.current.length; i++) {
-                    const container = containerRefs.current[i];
-                    if (!container) continue;
-
-                    const rect = container.getBoundingClientRect();
-                    const { clientX, clientY } = event;
-
-                    if (
-                      clientX >= rect.left &&
-                      clientX <= rect.right &&
-                      clientY >= rect.top &&
-                      clientY <= rect.bottom
-                    ) {
-                      if (i !== draggedTask.fromIndex) {
-                        const updatedInputs = [...inputs];
-                        updatedInputs[draggedTask.fromIndex].arr.splice(
-                          draggedTask.taskIndex,
-                          1
-                        );
-                        updatedInputs[i].arr.push(draggedTask.task);
-                        setInputs(updatedInputs);
-                      }
-                      break;
-                    }
-                  }
-
-                  setDraggedTask(null);
-                }}
                 className="flex gap-[8px] p-2 bg-black/20 rounded justify-between items-center"
               >
                 {editingTask &&

@@ -169,7 +169,7 @@ function Main() {
                 dragMomentum={false}
                 dragElastic={0}
                 layout
-                className="flex gap-2 mt-2 justify-between items-center absolute "
+                className="flex gap-[8px] mt-[8px] justify-between items-center absolute "
                 key={key}
               >
                 {editingTask &&
@@ -179,18 +179,18 @@ function Main() {
                     <input
                       value={editingTask.value}
                       onChange={handleEditChange}
-                      className="px-2 py-1 w-[150px] text-sm"
+                      className="px-[8px] py-[4px] w-[150px] text-[20px]"
                     />
-                    <div className="flex gap-1">
+                    <div className="flex gap-[4px]">
                       <button
                         onClick={saveEdit}
-                        className="bg-white text-xs px-2"
+                        className="bg-white text-[16px] px-[8px]"
                       >
                         Save
                       </button>
                       <button
                         onClick={cancelEdit}
-                        className="bg-white text-xs px-2"
+                        className="bg-white text-[16px] px-[8px]"
                       >
                         Cancel
                       </button>
@@ -199,7 +199,7 @@ function Main() {
                 ) : (
                   <>
                     <p
-                      className={`text-white text-sm flex-1 ${
+                      className={`text-white text-[20px] flex-1 ${
                         task.done ? "line-through opacity-50" : ""
                       }`}
                     >
@@ -208,18 +208,18 @@ function Main() {
                     <div className="flex gap-1">
                       <button
                         onClick={() => toggleDone(index, key)}
-                        className="bg-white text-xs px-2"
+                        className="bg-white text-[16px] px-[8px]"
                       >
                         Done
                       </button>
                       <button
                         onClick={() => deleteTask(index, key)}
-                        className="bg-white text-xs px-2"
+                        className="bg-white text-[16px] px-[8px]"
                       >
                         Delete
                       </button>
                       <button
-                        className="bg-white text-xs px-2"
+                        className="bg-white text-[16px] px-[8px]"
                         onClick={() => startEditing(index, key, task.text)}
                       >
                         Edit
@@ -233,14 +233,14 @@ function Main() {
         </motion.div>
       ))}
 
-      <div className="fixed bottom-5 left-1/2 transform -translate-x-1/2 flex flex-col items-center gap-4">
+      <div className="fixed bottom-[20px] left-[50%] transform -translate-x-1/2 flex flex-col items-center gap-[20px]">
         {popup && (
-          <div className="flex gap-4">
+          <div className="flex gap-[20px]">
             {["blue", "red", "green", "yellow", "purple"].map((color) => (
               <button
                 key={color}
                 onClick={() => addTask(color)}
-                className="w-12 h-12 rounded-full"
+                className="w-[50px] h-[50px] rounded-full"
                 style={{ backgroundColor: color }}
               />
             ))}

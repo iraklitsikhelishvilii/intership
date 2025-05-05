@@ -175,6 +175,10 @@ function Main() {
     <div className="w-full min-h-screen p-5 flex flex-wrap gap-4">
       {inputs.map((input, index) => (
         <motion.div
+          drag
+          dragMomentum={false}
+          dragElastic={0}
+          layout
           key={index}
           ref={(el) => {
             containerRefs.current[index] = el as HTMLDivElement | null;

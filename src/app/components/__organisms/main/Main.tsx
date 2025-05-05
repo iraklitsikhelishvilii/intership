@@ -1,10 +1,15 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
+
+interface Task {
+  text: string;
+  done: boolean;
+}
 
 interface CollorArr {
   color: string;
-  arr: { text: string; done: boolean }[];
+  arr: Task[];
 }
 
 function Main() {
@@ -16,7 +21,14 @@ function Main() {
     taskIndex: number;
     value: string;
   } | null>(null);
+  const [draggedTask, setDraggedTask] = useState<{
+    task: Task;
+    fromIndex: number;
+    taskIndex: number;
+  } | null>(null);
   const [mount, setMount] = useState(false);
+
+  const containerRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
     const storedInputs = localStorage.getItem("inputs");
@@ -126,13 +138,10 @@ function Main() {
     <div className="w-full min-h-screen p-5 flex flex-wrap gap-4">
       {inputs.map((input, index) => (
         <motion.div
-          drag
-          dragMomentum={false}
-          dragElastic={0}
-          layout
           key={index}
+          ref={(el) => (containerRefs.current[index] = el)}
           style={{ backgroundColor: input.color }}
-          className=" cursor-pointer w-[300px]  h-[250px] overflow-auto  rounded-[15px] flex flex-col px-5 py-4 items-center shadow-xl relative"
+          className="w-[300px] h-[250px]  rounded-[15px] flex flex-col px-5 py-4 items-center shadow-xl relative"
         >
           <div className="flex items-center justify-between w-[100%]">
             <button
@@ -143,7 +152,7 @@ function Main() {
             </button>
             <button
               onClick={() => deleteInput(index)}
-              className="w-[24px] h-[24px] rounded-[50%] border border-black flex items-center justify-center bg-white text-[14px] "
+              className="w-[24px] h-[24px] rounded-[50%] border border-black flex items-center justify-center bg-white text-[14px]"
             >
               x
             </button>
@@ -162,19 +171,52 @@ function Main() {
           >
             Add
           </button>
-          <div className="mt-4 w-full">
-            {input.arr.map((task, key) => (
+          <div className="mt-4 w-full space-y-2 relative">
+            {input.arr.map((task, taskIndex) => (
               <motion.div
+                key={taskIndex}
                 drag
                 dragMomentum={false}
                 dragElastic={0}
-                layout
-                className="flex gap-[8px] mt-[8px] justify-between items-center absolute "
-                key={key}
+                onDragStart={() =>
+                  setDraggedTask({ task, fromIndex: index, taskIndex })
+                }
+                onDragEnd={(event, info) => {
+                  if (!draggedTask) return;
+
+                  for (let i = 0; i < containerRefs.current.length; i++) {
+                    const container = containerRefs.current[i];
+                    if (!container) continue;
+
+                    const rect = container.getBoundingClientRect();
+                    const { clientX, clientY } = event;
+
+                    if (
+                      clientX >= rect.left &&
+                      clientX <= rect.right &&
+                      clientY >= rect.top &&
+                      clientY <= rect.bottom
+                    ) {
+                      if (i !== draggedTask.fromIndex) {
+                        const updatedInputs = [...inputs];
+                        updatedInputs[draggedTask.fromIndex].arr.splice(
+                          draggedTask.taskIndex,
+                          1
+                        );
+                        updatedInputs[i].arr.push(draggedTask.task);
+                        setInputs(updatedInputs);
+                      }
+                      break;
+                    }
+                  }
+
+                  setDraggedTask(null);
+                }}
+                className="flex gap-[8px] p-2 bg-black/20 rounded justify-between items-center"
               >
                 {editingTask &&
                 editingTask.inputIndex === index &&
-                editingTask.taskIndex === key ? (
+                editingTask.taskIndex === taskIndex ? (
                   <>
                     <input
                       value={editingTask.value}
@@ -199,7 +241,7 @@ function Main() {
                 ) : (
                   <>
                     <p
-                      className={`text-white text-[20px] flex-1 ${
+                      className={`text-white text-[16px] flex-1 ${
                         task.done ? "line-through opacity-50" : ""
                       }`}
                     >
@@ -207,20 +249,22 @@ function Main() {
                     </p>
                     <div className="flex gap-1">
                       <button
-                        onClick={() => toggleDone(index, key)}
-                        className="bg-white text-[16px] px-[8px]"
+                        onClick={() => toggleDone(index, taskIndex)}
+                        className="bg-white text-[12px] px-[8px]"
                       >
                         Done
                       </button>
                       <button
-                        onClick={() => deleteTask(index, key)}
-                        className="bg-white text-[16px] px-[8px]"
+                        onClick={() => deleteTask(index, taskIndex)}
+                        className="bg-white text-[12px] px-[8px]"
                       >
                         Delete
                       </button>
                       <button
-                        className="bg-white text-[16px] px-[8px]"
-                        onClick={() => startEditing(index, key, task.text)}
+                        className="bg-white text-[12px] px-[8px]"
+                        onClick={() =>
+                          startEditing(index, taskIndex, task.text)
+                        }
                       >
                         Edit
                       </button>
@@ -248,7 +292,7 @@ function Main() {
         )}
         <button
           onClick={togglePopup}
-          className="w-12 h-12 rounded-full border border-black flex items-center justify-center bg-white"
+          className="w-[48px] h-[48px] rounded-full border border-black flex items-center justify-center bg-white"
         >
           <p className="text-xl">+</p>
         </button>

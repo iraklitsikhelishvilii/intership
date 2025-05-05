@@ -184,12 +184,12 @@ function Main() {
             containerRefs.current[index] = el as HTMLDivElement | null;
           }}
           style={{ backgroundColor: input.color }}
-          className="w-[300px] h-[250px] overflow-auto rounded-[15px] flex flex-col px-5 py-4 items-center shadow-xl relative"
+          className="w-[300px] h-[250px] overflow-auto rounded-[15px] flex flex-col px-[20px] py-[16px] items-center shadow-xl relative"
         >
-          <div className="flex items-center justify-between w-full">
+          <div className="flex items-center justify-between w-[100%]">
             <button
               onClick={() => downloadTasks(index)}
-              className="bg-white text-xs px-2 py-1 rounded shadow self-start mb-2"
+              className="bg-white text-[16px] px-[8px] py-[4px] rounded shadow self-start mb-[8px]"
             >
               Download
             </button>
@@ -204,17 +204,17 @@ function Main() {
           <input
             value={inputValues[index] || ""}
             onChange={(e) => handleChange(e, index)}
-            className="w-full min-h-[30px] border border-black outline-none px-[12px]"
+            className="w-[100%s] min-h-[30px] border border-black outline-none px-[12px]"
             type="text"
             placeholder="Add a task..."
           />
           <button
             onClick={() => handleAddText(index)}
-            className="w-full h-8 border-2 border-black mt-2 flex items-center justify-center bg-white"
+            className="w-[100%] h-[32px] border-[2px] border-black mt-[8px] flex items-center justify-center bg-white"
           >
             Add
           </button>
-          <div className="mt-4 w-full space-y-2">
+          <div className="mt-[16px] w-full space-y-[8px]">
             {input.arr.map((task, taskIndex) => (
               <motion.div
                 key={taskIndex}
@@ -222,7 +222,7 @@ function Main() {
                 onDragStart={() =>
                   setDraggedTask({ task, fromIndex: index, taskIndex })
                 }
-                className="flex gap-[8px] p-2 bg-black/20 rounded justify-between items-center"
+                className="flex gap-[8px] p-[8px] bg-black/20 rounded justify-between items-center"
               >
                 {editingTask &&
                 editingTask.inputIndex === index &&
